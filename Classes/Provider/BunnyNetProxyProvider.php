@@ -20,6 +20,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use TYPO3\CMS\Core\Site\Entity\Site;
 
 /**
  * Uses bunny.net API with API AccessKey.
@@ -34,9 +35,13 @@ class BunnyNetProxyProvider implements ProxyProviderInterface, LoggerAwareInterf
     /** @var Client */
     protected $client;
 
-    public function __construct(Client $client)
+    /** @var Site[] */
+    protected $sites;
+
+    public function __construct(Client $client, array $sites)
     {
         $this->client = $client;
+        $this->sites = $sites;
     }
 
     /**
@@ -60,6 +65,11 @@ class BunnyNetProxyProvider implements ProxyProviderInterface, LoggerAwareInterf
      */
     public function flushAllUrls($urls = [])
     {
+        if ($urls === []) {
+            foreach ($this->sites as $site) {
+                $urls[] = (string) $site->getBase();
+            }
+        }
         $this->purgeMultipleUrls($urls, true);
     }
 

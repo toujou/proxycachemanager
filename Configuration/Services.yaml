@@ -62,3 +62,4 @@ services:
     public: true
     arguments:
       $client: '@b13.bunnynet.guzzle_client'
+      $sites: '@=service("TYPO3\\CMS\\Core\\Site\\SiteFinder").getAllSites()'
