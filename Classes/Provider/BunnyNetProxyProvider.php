@@ -16,10 +16,10 @@ namespace B13\Proxycachemanager\Provider;
  * The TYPO3 project - inspiring people to share!
  */
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use ToshY\BunnyNet\BaseRequest;
 
 /**
  * Uses bunny.net API with API AccessKey.
@@ -27,14 +27,17 @@ use ToshY\BunnyNet\BaseRequest;
  *
  * Ensure to set the environment variable BUNNY_ACCESSKEY_TOKEN.
  */
-class BunnyProxyProvider implements ProxyProviderInterface, LoggerAwareInterface
+class BunnyNetProxyProvider implements ProxyProviderInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /**
-     * @var BaseRequest
-     */
+    /** @var Client */
     protected $client;
+
+    public function __construct(Client $client)
+    {
+        $this->client = $client;
+    }
 
     /**
      * @inheritDoc
@@ -49,20 +52,7 @@ class BunnyProxyProvider implements ProxyProviderInterface, LoggerAwareInterface
      */
     public function flushCacheForUrl($url)
     {
-        if (!$this->isActive()) {
-            return;
-        }
-
-        try {
-            $this->getClient()->purgeUrl([
-                'url' => $url,
-            ]);
-        } catch (TransferException $e) {
-            $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
-                'urls' => $url,
-                'exception' => $e,
-            ]);
-        }
+        $this->purgeMultipleUrls([$url]);
     }
 
     /**
@@ -70,11 +60,7 @@ class BunnyProxyProvider implements ProxyProviderInterface, LoggerAwareInterface
      */
     public function flushAllUrls($urls = [])
     {
-        if (!$this->isActive()) {
-            return;
-        }
-
-        $this->purgeMulitpleUrls($urls, true);
+        $this->purgeMultipleUrls($urls, true);
     }
 
     /**
@@ -82,37 +68,22 @@ class BunnyProxyProvider implements ProxyProviderInterface, LoggerAwareInterface
      */
     public function flushCacheForUrls(array $urls)
     {
-        if (!$this->isActive()) {
-            return;
-        }
-
-        $this->purgeMulitpleUrls($urls);
+        $this->purgeMultipleUrls($urls);
     }
 
-    public function purgeMulitpleUrls(array $urls, bool $appendWildcard = false)
+    private function purgeMultipleUrls(array $urls, bool $appendWildcard = false): void
     {
         foreach ($urls as $url) {
             try {
-                $this->getClient()->purgeUrl([
-                    'url' => $url . ($appendWildcard ? '*': ''),
+                $this->client->post('', [
+                    'query' => ['url' => $url . ($appendWildcard ? '*': ''),]
                 ]);
             } catch (TransferException $e) {
-                $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
-                    'urls' => $url,
+                $this->logger->error('Could not flush URL via POST', [
+                    'url' => $url,
                     'exception' => $e,
                 ]);
             }
         }
-    }
-
-    protected function isActive(): bool
-    {
-        return !empty(getenv('BUNNY_ACCESSKEY_TOKEN'));
-    }
-
-    protected function getClient(): BaseRequest
-    {
-        $this->client = new BaseRequest(getenv('BUNNY_ACCESSKEY_TOKEN'));
-        return $this->client;
     }
 }

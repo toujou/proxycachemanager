@@ -24,18 +24,11 @@
 			"typo3/cms-composer-installers": true
 		}
 	},
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "https://github.com/toujou/BunnyNet-PHP.git"
-		}
-	],
 	"require": {
 		"php": "^7.2 || ^8.0",
 		"guzzlehttp/guzzle": "^6.0 || ^7.0",
 		"typo3/cms-core": "^10.0 || ^11.0",
-		"doctrine/dbal": "~2.13.1",
-		"toshy/bunnynet-php": "dev-master"
+		"doctrine/dbal": "~2.13.1"
 	},
 	"require-dev": {
 		"typo3/testing-framework": "^6",
