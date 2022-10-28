@@ -58,8 +58,11 @@ services:
         headers:
           AccessKey: '%env(default::string:BUNNY_ACCESSKEY_TOKEN)%'
 
+  B13\Proxycachemanager\Factory\SiteFactory:
+    public: true
+
   B13\Proxycachemanager\Provider\BunnyNetProxyProvider:
     public: true
     arguments:
       $client: '@b13.bunnynet.guzzle_client'
-      $sites: '@=service("TYPO3\\CMS\\Core\\Site\\SiteFinder").getAllSites()'
+      $sites: '@=service("B13\\Proxycachemanager\\Factory\\SiteFactory").getAllSitesBase()'
