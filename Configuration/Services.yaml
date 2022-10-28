@@ -48,3 +48,21 @@ services:
       - name: event.listener
         identifier: 'b13-proxycachemanager-afterFileAdded'
         event: TYPO3\CMS\Core\Resource\Event\AfterFileAddedEvent
+
+  b13.bunnynet.guzzle_client:
+    class: GuzzleHttp\Client
+    lazy: true
+    arguments:
+      $config:
+        base_uri: 'https://api.bunny.com/purge/'
+        headers:
+          AccessKey: '%env(default::string:BUNNY_ACCESSKEY_TOKEN)%'
+
+  B13\Proxycachemanager\Factory\SiteFactory:
+    public: true
+
+  B13\Proxycachemanager\Provider\BunnyNetProxyProvider:
+    public: true
+    arguments:
+      $client: '@b13.bunnynet.guzzle_client'
+      $sites: '@=service("B13\\Proxycachemanager\\Factory\\SiteFactory").getAllSitesBase()'
