@@ -77,10 +77,6 @@ class CacheController implements ClearCacheActionsHookInterface
      */
     public function flushAction()
     {
-
-        // TODO: use CacheService
-
-
         $providerClassName = $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_proxy']['options']['reverseProxyProvider'] ?? null;
         if ($providerClassName) {
             /** @var ProxyProviderInterface $cacheProvider */
