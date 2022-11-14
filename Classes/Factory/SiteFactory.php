@@ -20,7 +20,8 @@ class SiteFactory
 
         $siteUrls = [];
         foreach ($sites as $site) {
-            $siteUrls[] = (string) $site->getBase();
+            $baseUri = (string) $site->getBase();
+            $siteUrls[] = rtrim($baseUri, '/') . '/';
         }
         return $siteUrls;
     }
