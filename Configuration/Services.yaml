@@ -54,7 +54,7 @@ services:
     lazy: true
     arguments:
       $config:
-        base_uri: 'https://api.bunny.com/purge/'
+        base_uri: 'https://api.bunny.net/purge/'
         headers:
           AccessKey: '%env(default::string:BUNNY_ACCESSKEY_TOKEN)%'
 
