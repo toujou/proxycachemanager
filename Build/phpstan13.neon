@@ -1,0 +1,10 @@
+includes:
+  - phpstan-baseline-13.neon
+parameters:
+  level: 5
+
+  paths:
+    - %currentWorkingDirectory%/Classes
+
+  ignoreErrors:
+
